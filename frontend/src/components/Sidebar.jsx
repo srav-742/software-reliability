@@ -14,6 +14,7 @@ import {
   Settings,
   ShieldCheck,
   FileCode2,
+  GitPullRequest,
 } from 'lucide-react';
 
 const navItems = [
@@ -25,6 +26,7 @@ const navItems = [
   { path: '/explainability', label: 'SHAP Explainability', icon: Eye },
   { path: '/recommendations', label: 'AI Recommendations', icon: Sparkles },
   { path: '/training', label: 'Model Training', icon: Cpu },
+  { path: '/cicd', label: 'CI/CD Integration', icon: GitPullRequest },
   { path: '/reports', label: 'Reports', icon: FileSpreadsheet },
   { path: '/profile', label: 'Profile', icon: User },
   { path: '/settings', label: 'Settings', icon: Settings },

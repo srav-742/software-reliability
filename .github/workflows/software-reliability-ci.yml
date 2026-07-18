@@ -1,0 +1,31 @@
+name: Software Reliability Quality Gate
+
+on:
+  push:
+    branches: [ "main", "master", "develop" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  reliability-assessment:
+    name: ML Reliability Risk Scan & Build Gate
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Run Software Reliability Quality Gate
+        env:
+          RELIABILITY_API_URL: ${{ secrets.RELIABILITY_API_URL || 'http://localhost:8000' }}
+          RELIABILITY_API_KEY: ${{ secrets.RELIABILITY_API_KEY }}
+          RELIABILITY_PROJECT_NAME: ${{ github.event.repository.name }}
+          RELIABILITY_FAIL_THRESHOLD: '80.0'
+          RELIABILITY_WARN_THRESHOLD: '50.0'
+        run: |
+          python cli/reliability_cli.py

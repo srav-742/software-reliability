@@ -342,13 +342,29 @@ export default function Prediction() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {(prediction?.recommendations || [
-                '[+0.42] High Complexity: Refactor long methods.',
-                '[+0.26] Nested Logic: Reduce nested conditions.',
-                '[+0.15] Database Queries: Optimize SQL queries.',
-              ]).map((rec, idx) => (
-                <RecommendationCard key={idx} rawRecommendation={rec} index={idx} />
-              ))}
+              {(() => {
+                const recs = prediction?.recommendations;
+                let recList = [];
+                if (Array.isArray(recs)) {
+                  recList = recs;
+                } else if (typeof recs === 'string' && recs.trim().length > 0) {
+                  try {
+                    const parsed = JSON.parse(recs);
+                    recList = Array.isArray(parsed) ? parsed : [recs];
+                  } catch {
+                    recList = [recs];
+                  }
+                } else {
+                  recList = [
+                    '[+0.42] High Complexity: Refactor long methods.',
+                    '[+0.26] Nested Logic: Reduce nested conditions.',
+                    '[+0.15] Database Queries: Optimize SQL queries.',
+                  ];
+                }
+                return recList.map((rec, idx) => (
+                  <RecommendationCard key={idx} rawRecommendation={rec} index={idx} />
+                ));
+              })()}
             </div>
           </div>
 

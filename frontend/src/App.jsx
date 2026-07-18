@@ -15,6 +15,7 @@ import Prediction from './pages/Prediction';
 import Explainability from './pages/Explainability';
 import Recommendations from './pages/Recommendations';
 import Training from './pages/Training';
+import CicdIntegration from './pages/CicdIntegration';
 import Reports from './pages/Reports';
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
@@ -47,6 +48,7 @@ export default function App() {
             <Route path="explainability" element={<Explainability />} />
             <Route path="recommendations" element={<Recommendations />} />
             <Route path="training" element={<Training />} />
+            <Route path="cicd" element={<CicdIntegration />} />
             <Route path="reports" element={<Reports />} />
             <Route path="profile" element={<Profile />} />
             <Route path="settings" element={<Settings />} />

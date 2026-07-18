@@ -86,4 +86,17 @@ export const healthApi = {
   check: () => api.get('/health'),
 };
 
+// API Key endpoints
+export const apiKeyApi = {
+  getAll: () => api.get('/auth/api-keys/'),
+  create: (name) => api.post('/auth/api-keys/', { name }),
+  revoke: (id) => api.delete(`/auth/api-keys/${id}`),
+};
+
+// CI/CD Scan endpoints
+export const cicdApi = {
+  getScans: (projectId = null) => api.get(`/cicd/scans${projectId ? `?project_id=${projectId}` : ''}`),
+  getScanById: (id) => api.get(`/cicd/scans/${id}`),
+};
+
 export default api;

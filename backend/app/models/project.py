@@ -88,3 +88,9 @@ class Project(Base):
         back_populates="project",
         cascade="all, delete-orphan"
     )
+
+    cicd_scans = relationship(
+        "CICDScan",
+        back_populates="project",
+        cascade="all, delete-orphan"
+    )

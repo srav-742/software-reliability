@@ -42,3 +42,9 @@ class User(Base):
         back_populates="user",
         cascade="all, delete-orphan"
     )
+
+    api_keys = relationship(
+        "ApiKey",
+        back_populates="owner",
+        cascade="all, delete-orphan"
+    )

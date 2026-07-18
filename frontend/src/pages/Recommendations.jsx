@@ -64,7 +64,16 @@ export default function Recommendations() {
           recs = predRes.data?.recommendations || [];
         }
 
-        if (!recs || recs.length === 0) {
+        if (typeof recs === 'string') {
+          try {
+            const parsed = JSON.parse(recs);
+            recs = Array.isArray(parsed) ? parsed : [recs];
+          } catch {
+            recs = [recs];
+          }
+        }
+
+        if (!Array.isArray(recs) || recs.length === 0) {
           recs = [
             '[+0.42] High Complexity: Refactor long methods.',
             '[+0.26] Nested Logic: Reduce nested conditions.',

@@ -2,6 +2,12 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.router import api_router
+from app.database.base import Base
+from app.database.session import engine
+import app.models  # Ensures all models are registered with Base
+
+# Auto-create missing database tables
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="Software Reliability API",
