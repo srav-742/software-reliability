@@ -14,12 +14,16 @@ from app.models.metrics import ApiMetric
 from app.models.prediction import Prediction
 from app.models.training import TrainingRun
 from app.models.model_registry import ModelRegistry
+from app.config import settings
 
 config = context.config
 
 load_dotenv()
 
-database_url = os.getenv("DATABASE_URL")
+database_url = os.getenv("DATABASE_URL") or settings.DATABASE_URL
+if database_url and database_url.startswith("postgres://"):
+    database_url = database_url.replace("postgres://", "postgresql://", 1)
+
 config.set_main_option("sqlalchemy.url", database_url)
 
 if config.config_file_name is not None:
@@ -48,8 +52,11 @@ def run_migrations_offline():
 def run_migrations_online():
     """Run migrations in online mode."""
 
+    configuration = config.get_section(config.config_ini_section) or {}
+    configuration["sqlalchemy.url"] = database_url
+
     connectable = engine_from_config(
-        config.get_section(config.config_ini_section),
+        configuration,
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )
