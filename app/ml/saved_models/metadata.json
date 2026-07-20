@@ -1,0 +1,39 @@
+{
+  "algorithm": "logistic_regression",
+  "metrics": {
+    "accuracy": 0.9933,
+    "precision": 0.9835,
+    "recall": 0.9944,
+    "f1_score": 0.989,
+    "roc_auc": 0.9999
+  },
+  "feature_columns": [
+    "lines_of_code",
+    "cyclomatic_complexity",
+    "number_of_functions",
+    "number_of_parameters",
+    "nested_depth",
+    "if_statement_count",
+    "loop_count",
+    "imports_count",
+    "dependency_count",
+    "duplicate_code_score",
+    "exception_handling_count",
+    "database_queries",
+    "external_api_calls",
+    "cpu_usage",
+    "memory_usage",
+    "average_response_time",
+    "test_coverage",
+    "historical_bug_count",
+    "complexity_per_function",
+    "params_per_function",
+    "loc_per_function",
+    "external_dependency_ratio",
+    "untested_complexity",
+    "duplication_depth",
+    "resource_intensity",
+    "composite_risk_index"
+  ],
+  "version": "1.0"
+}

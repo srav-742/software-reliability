@@ -12,12 +12,16 @@ ENV/
 backend/firebase-service-account.json
 firebase-service-account.json
 firebase_config.js
+*.pem
 
 # Large test uploads & temporary data
 backend/uploads/
 uploads/
 catboost_info/
 backend/catboost_info/
+*.db
+*.sqlite
+*.db.sqlite
 
 # Build outputs
 dist/
@@ -46,8 +50,3 @@ npm-debug.log*
 .idea/
 .DS_Store
 Thumbs.db
-
-# Database files
-*.db
-*.sqlite
-*.db.sqlite
