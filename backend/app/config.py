@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Union
 from pydantic import field_validator
 from pydantic_settings import BaseSettings
 
@@ -7,6 +7,17 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
     LOG_LEVEL: str = "INFO"
     CORS_ORIGINS: list[str] = ["*"]
+
+    @field_validator("CORS_ORIGINS", mode="before")
+    @classmethod
+    def assemble_cors_origins(cls, v: Union[str, list[str]]) -> list[str]:
+        if isinstance(v, str):
+            v_str = v.strip()
+            if not v_str.startswith("["):
+                return [item.strip().rstrip("/") for item in v_str.split(",") if item.strip()]
+        if isinstance(v, list):
+            return [item.rstrip("/") if isinstance(item, str) else item for item in v]
+        return v
 
     DATABASE_URL: str = "sqlite:///./software_reliability.db"
 

@@ -1,13 +1,17 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
 
 from app.api.router import api_router
-from app.database.base import Base
-from app.database.session import engine
-import app.models  # Ensures all models are registered with Base
+from app.config import settings
+from app.core.logging import setup_logging, RequestIdMiddleware
+from app.core.rate_limit import limiter
+from app.core.monitoring import init_sentry, init_monitoring
 
-# Auto-create missing database tables
-Base.metadata.create_all(bind=engine)
+# Initialize structured logging and Sentry error tracking
+logger = setup_logging()
+init_sentry()
 
 app = FastAPI(
     title="Software Reliability API",
@@ -15,16 +19,26 @@ app = FastAPI(
     version="1.0.0",
 )
 
-# CORS middleware configuration (crucial for frontend integration)
+# Rate limiting state & exception handler
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+# Request ID correlation middleware
+app.add_middleware(RequestIdMiddleware)
+
+# CORS middleware configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=settings.CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Include api_router
+# Prometheus metrics setup
+init_monitoring(app)
+
+# Include API router
 app.include_router(api_router, prefix="/api/v1")
 
 
