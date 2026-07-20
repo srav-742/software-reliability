@@ -20,14 +20,9 @@ export default function Login() {
       await login(email, password);
       navigate('/dashboard');
     } catch (err) {
-      const msg = err.response?.data?.detail;
-      if (msg) {
-        setError(typeof msg === 'string' ? msg : JSON.stringify(msg));
-      } else if (!err.response) {
-        setError('Unable to connect to the backend server. Please verify backend deployment and CORS settings.');
-      } else {
-        setError('Invalid email or password. Please try again.');
-      }
+      setError(
+        err.response?.data?.detail || 'Invalid email or password. Please try again.'
+      );
     } finally {
       setLoading(false);
     }

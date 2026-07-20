@@ -22,14 +22,9 @@ export default function Register() {
       await register(email, fullName, password, role);
       navigate('/dashboard');
     } catch (err) {
-      const msg = err.response?.data?.detail;
-      if (msg) {
-        setError(typeof msg === 'string' ? msg : JSON.stringify(msg));
-      } else if (!err.response) {
-        setError('Unable to connect to the backend server. Please verify backend deployment and CORS settings.');
-      } else {
-        setError('Registration failed. Please check your details and try again.');
-      }
+      setError(
+        err.response?.data?.detail || 'Registration failed. Email might already be registered.'
+      );
     } finally {
       setLoading(false);
     }

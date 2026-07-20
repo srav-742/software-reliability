@@ -1,0 +1,52 @@
+# Dependencies
+node_modules/
+frontend/node_modules/
+.venv/
+venv/
+env/
+ENV/
+
+# Secrets & Service Account keys
+*firebase*.json
+*service-account*.json
+backend/firebase-service-account.json
+firebase-service-account.json
+firebase_config.js
+*.pem
+
+# Large test uploads & temporary data
+backend/uploads/
+uploads/
+catboost_info/
+backend/catboost_info/
+*.db
+*.sqlite
+*.db.sqlite
+
+# Build outputs
+dist/
+frontend/dist/
+build/
+
+# Python caches & artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+*.zip
+
+# Environment & local config
+.env
+.env.local
+.env.*.local
+*.log
+npm-debug.log*
+
+# IDE & OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

@@ -1,4 +1,5 @@
-from typing import Optional, Union
+import json
+from typing import Any, Optional, Union
 from pydantic import field_validator
 from pydantic_settings import BaseSettings
 
@@ -6,18 +7,39 @@ from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
     LOG_LEVEL: str = "INFO"
-    CORS_ORIGINS: list[str] = ["*"]
+    CORS_ORIGINS: Any = ["*"]
+    CORS_ORIGIN_REGEX: Optional[str] = r"https://.*\.vercel\.app"
 
     @field_validator("CORS_ORIGINS", mode="before")
     @classmethod
-    def assemble_cors_origins(cls, v: Union[str, list[str]]) -> list[str]:
+    def assemble_cors_origins(cls, v: Any) -> list[str]:
         if isinstance(v, str):
-            v_str = v.strip()
-            if not v_str.startswith("["):
-                return [item.strip().rstrip("/") for item in v_str.split(",") if item.strip()]
+            v_str = v.strip().strip("'\"")
+            if not v_str:
+                return ["*"]
+            if v_str.startswith("["):
+                try:
+                    parsed = json.loads(v_str)
+                    if isinstance(parsed, list):
+                        return [
+                            item.strip().strip("'\"").rstrip("/")
+                            for item in parsed
+                            if isinstance(item, str) and item.strip()
+                        ]
+                except Exception:
+                    pass
+            return [
+                item.strip().strip("'\"").rstrip("/")
+                for item in v_str.split(",")
+                if item.strip()
+            ]
         if isinstance(v, list):
-            return [item.rstrip("/") if isinstance(item, str) else item for item in v]
-        return v
+            return [
+                item.strip().strip("'\"").rstrip("/")
+                for item in v
+                if isinstance(item, str) and item.strip()
+            ]
+        return ["*"]
 
     DATABASE_URL: str = "sqlite:///./software_reliability.db"
 

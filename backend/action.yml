@@ -1,0 +1,43 @@
+name: 'Software Reliability AI Risk Analyzer'
+description: 'Runs automated static software metrics extraction and ML-based failure risk prediction on push/PR.'
+author: 'Software Reliability Team'
+
+inputs:
+  api-url:
+    description: 'URL of the Software Reliability API instance'
+    required: true
+    default: 'http://localhost:8000'
+  api-key:
+    description: 'API Key generated from Software Reliability Dashboard'
+    required: true
+  project-name:
+    description: 'Name of the project to track in Software Reliability'
+    required: false
+    default: '${{ github.event.repository.name }}'
+  fail-threshold:
+    description: 'Risk Score percentage threshold that triggers workflow build failure (e.g. 80.0)'
+    required: false
+    default: '80.0'
+  warn-threshold:
+    description: 'Risk Score percentage threshold for warning status (e.g. 50.0)'
+    required: false
+    default: '50.0'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+
+    - name: Execute Software Reliability Scan
+      shell: bash
+      env:
+        RELIABILITY_API_URL: ${{ inputs.api-url }}
+        RELIABILITY_API_KEY: ${{ inputs.api-key }}
+        RELIABILITY_PROJECT_NAME: ${{ inputs.project-name }}
+        RELIABILITY_FAIL_THRESHOLD: ${{ inputs.fail-threshold }}
+        RELIABILITY_WARN_THRESHOLD: ${{ inputs.warn-threshold }}
+      run: |
+        python cli/reliability_cli.py

@@ -13,10 +13,26 @@ from app.core.monitoring import init_sentry, init_monitoring
 logger = setup_logging()
 init_sentry()
 
+from contextlib import asynccontextmanager
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Ensure database tables exist on startup."""
+    try:
+        from app.database.base import Base
+        from app.database.session import engine
+        import app.models  # ensure models are registered
+        Base.metadata.create_all(bind=engine)
+        logger.info("Database tables verified/created successfully.")
+    except Exception as e:
+        logger.error(f"Error initializing database tables on startup: {e}")
+    yield
+
 app = FastAPI(
     title="Software Reliability API",
     description="API backend for Software Reliability prediction, registry, and analysis.",
     version="1.0.0",
+    lifespan=lifespan,
 )
 
 # Rate limiting state & exception handler
@@ -30,6 +46,7 @@ app.add_middleware(RequestIdMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,
+    allow_origin_regex=settings.CORS_ORIGIN_REGEX or None,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
