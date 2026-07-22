@@ -18,7 +18,7 @@ from app.config import settings
 
 config = context.config
 
-load_dotenv()
+load_dotenv(override=False)
 
 database_url = os.getenv("DATABASE_URL") or settings.DATABASE_URL
 if database_url:
