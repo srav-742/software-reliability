@@ -20,12 +20,35 @@ try:
     logger.info("Firebase Admin is already initialized.")
 except ValueError:
     try:
+        sa_json_env = os.getenv("FIREBASE_SERVICE_ACCOUNT_JSON")
         sa_path = settings.FIREBASE_SERVICE_ACCOUNT_PATH
-        if sa_path and os.path.exists(sa_path):
+        client_email = os.getenv("FIREBASE_CLIENT_EMAIL")
+        private_key = os.getenv("FIREBASE_PRIVATE_KEY")
+
+        if sa_json_env:
+            import json
+            cred_dict = json.loads(sa_json_env)
+            cred = credentials.Certificate(cred_dict)
+            firebase_app = firebase_admin.initialize_app(cred)
+            is_firebase_initialized = True
+            logger.info("Firebase Admin initialized with FIREBASE_SERVICE_ACCOUNT_JSON environment variable.")
+        elif client_email and private_key:
+            formatted_pk = private_key.replace("\\n", "\n")
+            cred_dict = {
+                "type": "service_account",
+                "project_id": settings.FIREBASE_PROJECT_ID,
+                "private_key": formatted_pk,
+                "client_email": client_email,
+            }
+            cred = credentials.Certificate(cred_dict)
+            firebase_app = firebase_admin.initialize_app(cred)
+            is_firebase_initialized = True
+            logger.info("Firebase Admin initialized with client_email and private_key environment variables.")
+        elif sa_path and os.path.exists(sa_path):
             cred = credentials.Certificate(sa_path)
             firebase_app = firebase_admin.initialize_app(cred)
             is_firebase_initialized = True
-            logger.info("Firebase Admin initialized with service account certificate.")
+            logger.info("Firebase Admin initialized with service account certificate file.")
         else:
             # Fallback initialization using project ID
             firebase_app = firebase_admin.initialize_app(
@@ -34,7 +57,7 @@ except ValueError:
             is_firebase_initialized = True
             logger.warning(
                 f"Firebase Admin initialized using projectId={settings.FIREBASE_PROJECT_ID} "
-                "without service account file. Custom token generation might fail if credentials are not loaded."
+                "without service account credentials. Firebase Auth operations will fail unless credentials are provided via environment variables."
             )
     except Exception as e:
         logger.error(f"Failed to initialize Firebase Admin SDK: {e}")
