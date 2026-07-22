@@ -47,10 +47,12 @@ class Settings(BaseSettings):
     @classmethod
     def assemble_db_connection(cls, v: str) -> str:
         if isinstance(v, str):
-            if v.startswith("postgres://"):
-                return v.replace("postgres://", "postgresql+psycopg2://", 1)
-            elif v.startswith("postgresql://"):
-                return v.replace("postgresql://", "postgresql+psycopg2://", 1)
+            v_clean = v.strip().strip("'\"")
+            if v_clean.startswith("postgres://"):
+                return v_clean.replace("postgres://", "postgresql+psycopg2://", 1)
+            elif v_clean.startswith("postgresql://"):
+                return v_clean.replace("postgresql://", "postgresql+psycopg2://", 1)
+            return v_clean
         return v
 
     # JWT Settings
