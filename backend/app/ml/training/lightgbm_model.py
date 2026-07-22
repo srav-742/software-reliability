@@ -2,7 +2,10 @@
 LightGBM Classifier for Software Reliability Prediction.
 """
 
-from lightgbm import LGBMClassifier
+try:
+    from lightgbm import LGBMClassifier
+except ImportError:
+    LGBMClassifier = None
 from typing import Dict, Any, Optional
 
 
@@ -37,6 +40,8 @@ def create_lightgbm(
     Returns:
         Configured LGBMClassifier instance.
     """
+    if LGBMClassifier is None:
+        raise RuntimeError("lightgbm package is not installed in this environment.")
     return LGBMClassifier(
         n_estimators=n_estimators,
         max_depth=max_depth,

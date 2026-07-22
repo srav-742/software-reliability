@@ -2,7 +2,10 @@
 XGBoost Classifier for Software Reliability Prediction.
 """
 
-from xgboost import XGBClassifier
+try:
+    from xgboost import XGBClassifier
+except ImportError:
+    XGBClassifier = None
 from typing import Dict, Any, Optional
 
 
@@ -35,6 +38,8 @@ def create_xgboost(
     Returns:
         Configured XGBClassifier instance.
     """
+    if XGBClassifier is None:
+        raise RuntimeError("xgboost package is not installed in this environment.")
     params = {
         "n_estimators": n_estimators,
         "max_depth": max_depth,

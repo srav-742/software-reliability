@@ -6,7 +6,10 @@ made a particular reliability prediction.
 """
 
 import numpy as np
-import shap
+try:
+    import shap
+except ImportError:
+    shap = None
 from typing import Dict, Any, List, Optional
 
 from app.ml.inference.model_loader import load_model

@@ -2,7 +2,10 @@
 CatBoost Classifier for Software Reliability Prediction.
 """
 
-from catboost import CatBoostClassifier
+try:
+    from catboost import CatBoostClassifier
+except ImportError:
+    CatBoostClassifier = None
 from typing import Dict, Any, Optional
 
 
@@ -29,6 +32,8 @@ def create_catboost(
     Returns:
         Configured CatBoostClassifier instance.
     """
+    if CatBoostClassifier is None:
+        raise RuntimeError("catboost package is not installed in this environment.")
     return CatBoostClassifier(
         iterations=iterations,
         depth=depth,
