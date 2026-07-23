@@ -25,15 +25,40 @@ except ValueError:
         client_email = os.getenv("FIREBASE_CLIENT_EMAIL")
         private_key = os.getenv("FIREBASE_PRIVATE_KEY")
 
+        logger.info(f"Firebase init check: sa_json_env={'SET' if sa_json_env else 'NOT SET'}, "
+                     f"client_email={'SET' if client_email else 'NOT SET'}, "
+                     f"private_key={'SET' if private_key else 'NOT SET'}, "
+                     f"sa_path={sa_path}, sa_path_exists={sa_path and os.path.exists(sa_path)}")
+
         if sa_json_env:
             import json
-            cred_dict = json.loads(sa_json_env)
+            # Handle potential escaping issues in the JSON string
+            try:
+                cred_dict = json.loads(sa_json_env)
+            except json.JSONDecodeError:
+                # Try unescaping if it was double-escaped
+                sa_json_env = sa_json_env.replace("\\\\n", "\\n")
+                cred_dict = json.loads(sa_json_env)
+            # Fix private_key newlines in the parsed dict
+            if "private_key" in cred_dict:
+                pk = cred_dict["private_key"]
+                # Handle both \\n (literal backslash-n) and already-correct \n
+                pk = pk.replace("\\n", "\n")
+                cred_dict["private_key"] = pk
             cred = credentials.Certificate(cred_dict)
             firebase_app = firebase_admin.initialize_app(cred)
             is_firebase_initialized = True
             logger.info("Firebase Admin initialized with FIREBASE_SERVICE_ACCOUNT_JSON environment variable.")
         elif client_email and private_key:
-            formatted_pk = private_key.replace("\\n", "\n")
+            # Handle multiple levels of escaping that can happen with env vars
+            # Render may store the key with literal \n, \\n, or actual newlines
+            formatted_pk = private_key
+            if "\\\\n" in formatted_pk:
+                formatted_pk = formatted_pk.replace("\\\\n", "\n")
+            elif "\\n" in formatted_pk:
+                formatted_pk = formatted_pk.replace("\\n", "\n")
+            # Strip surrounding quotes if present
+            formatted_pk = formatted_pk.strip().strip("'\"")
             cred_dict = {
                 "type": "service_account",
                 "project_id": settings.FIREBASE_PROJECT_ID,
@@ -60,7 +85,7 @@ except ValueError:
                 "without service account credentials. Firebase Auth operations will fail unless credentials are provided via environment variables."
             )
     except Exception as e:
-        logger.error(f"Failed to initialize Firebase Admin SDK: {e}")
+        logger.error(f"Failed to initialize Firebase Admin SDK: {e}", exc_info=True)
         is_firebase_initialized = False
 
 
