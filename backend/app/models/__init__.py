@@ -6,3 +6,4 @@ from .training import TrainingRun
 from .model_registry import ModelRegistry
 from .api_key import ApiKey
 from .cicd_scan import CICDScan
+from .api_key_scan import ApiKeyScan, DetectedApiKey

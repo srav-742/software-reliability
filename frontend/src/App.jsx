@@ -16,6 +16,7 @@ import Explainability from './pages/Explainability';
 import Recommendations from './pages/Recommendations';
 import Training from './pages/Training';
 import CicdIntegration from './pages/CicdIntegration';
+import ApiKeyScanner from './pages/ApiKeyScanner';
 import Reports from './pages/Reports';
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
@@ -49,6 +50,7 @@ export default function App() {
             <Route path="recommendations" element={<Recommendations />} />
             <Route path="training" element={<Training />} />
             <Route path="cicd" element={<CicdIntegration />} />
+            <Route path="api-key-scanner" element={<ApiKeyScanner />} />
             <Route path="reports" element={<Reports />} />
             <Route path="profile" element={<Profile />} />
             <Route path="settings" element={<Settings />} />

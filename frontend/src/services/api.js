@@ -110,4 +110,11 @@ export const cicdApi = {
   getScanById: (id) => api.get(`/cicd/scans/${id}`),
 };
 
+// API Key Scanner endpoints
+export const scanApi = {
+  scanKeys: (projectId) => api.post(`/projects/${projectId}/scan-keys`),
+  getResults: (projectId) => api.get(`/projects/${projectId}/scan-keys`),
+  getHistory: (projectId) => api.get(`/projects/${projectId}/scan-keys/history`),
+};
+
 export default api;

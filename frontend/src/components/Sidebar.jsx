@@ -15,6 +15,7 @@ import {
   ShieldCheck,
   FileCode2,
   GitPullRequest,
+  KeyRound,
 } from 'lucide-react';
 
 const navItems = [
@@ -27,6 +28,7 @@ const navItems = [
   { path: '/recommendations', label: 'AI Recommendations', icon: Sparkles },
   { path: '/training', label: 'Model Training', icon: Cpu },
   { path: '/cicd', label: 'CI/CD Integration', icon: GitPullRequest },
+  { path: '/api-key-scanner', label: 'API Key Scanner', icon: KeyRound },
   { path: '/reports', label: 'Reports', icon: FileSpreadsheet },
   { path: '/profile', label: 'Profile', icon: User },
   { path: '/settings', label: 'Settings', icon: Settings },

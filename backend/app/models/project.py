@@ -94,3 +94,9 @@ class Project(Base):
         back_populates="project",
         cascade="all, delete-orphan"
     )
+
+    api_key_scans = relationship(
+        "ApiKeyScan",
+        back_populates="project",
+        cascade="all, delete-orphan"
+    )
