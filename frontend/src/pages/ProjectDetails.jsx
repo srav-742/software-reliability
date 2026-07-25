@@ -15,6 +15,7 @@ import {
   Activity,
   Trash2,
   Zap,
+  FileSpreadsheet,
 } from 'lucide-react';
 
 export default function ProjectDetails() {
@@ -129,6 +130,14 @@ export default function ProjectDetails() {
           >
             <BrainCircuit className="w-4 h-4" />
             Run ML Prediction
+          </Link>
+
+          <Link
+            to={`/reports?project_id=${project.id}`}
+            className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl border border-slate-700 flex items-center gap-2 transition-all"
+          >
+            <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
+            View Executive Report
           </Link>
 
           <button

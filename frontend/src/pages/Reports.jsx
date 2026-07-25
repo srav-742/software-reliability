@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { projectApi, predictApi, analysisApi } from '../services/api';
 import { exportToPDF, exportToCSV, exportToExcel } from '../utils/reportExportUtils';
 import ReportChartEngine from '../components/ReportChartEngine';
@@ -21,8 +22,11 @@ import {
 } from 'lucide-react';
 
 export default function Reports() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialProjectId = searchParams.get('project_id') || '';
+
   const [projects, setProjects] = useState([]);
-  const [selectedProjectId, setSelectedProjectId] = useState('');
+  const [selectedProjectId, setSelectedProjectId] = useState(initialProjectId);
   const [reportData, setReportData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -35,7 +39,7 @@ export default function Reports() {
         const res = await projectApi.getAll();
         const list = res.data || [];
         setProjects(list);
-        if (list.length > 0) {
+        if (list.length > 0 && !initialProjectId) {
           setSelectedProjectId(list[0].id.toString());
         }
       } catch (err) {
@@ -104,7 +108,10 @@ export default function Reports() {
           {/* Project Selector */}
           <select
             value={selectedProjectId}
-            onChange={(e) => setSelectedProjectId(e.target.value)}
+            onChange={(e) => {
+              setSelectedProjectId(e.target.value);
+              setSearchParams({ project_id: e.target.value });
+            }}
             className="px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs font-medium text-slate-200 focus:outline-none focus:border-cyan-500"
           >
             {projects.map((p) => (

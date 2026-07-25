@@ -15,6 +15,7 @@ import {
   CheckCircle2,
   AlertCircle,
   Clock,
+  FileSpreadsheet,
 } from 'lucide-react';
 
 export default function Projects() {
@@ -210,6 +211,15 @@ export default function Projects() {
                 >
                   <BrainCircuit className="w-3.5 h-3.5" />
                   Predict
+                </Link>
+
+                <Link
+                  to={`/reports?project_id=${project.id}`}
+                  className="px-3 py-1.5 rounded-lg bg-emerald-950/60 border border-emerald-800/60 hover:bg-emerald-900/60 text-emerald-300 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+                  title="View Executive Report"
+                >
+                  <FileSpreadsheet className="w-3.5 h-3.5" />
+                  Report
                 </Link>
               </div>
 

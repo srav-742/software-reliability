@@ -80,6 +80,39 @@ class PredictionService:
                 risk_level=prediction["risk_level"],
             )
 
+        # 4b. Scan for static vulnerabilities (secrets, weak algorithms) & adjust probability
+        project = project_repository.get(db, id=project_id)
+        source_path = project.source_code_path if project else None
+        vulnerability_recommendations = []
+        
+        if source_path:
+            try:
+                from app.services.vulnerability_scanner import VulnerabilityScanner
+                findings = VulnerabilityScanner.scan(source_path)
+                for finding in findings:
+                    vulnerability_recommendations.append(json.dumps(finding))
+                
+                # Dynamic risk escalation if high-risk vulnerabilities are found
+                max_vuln_prob = 0.0
+                for vuln in findings:
+                    if vuln["severity"] == "Critical":
+                        max_vuln_prob = max(max_vuln_prob, 0.92)
+                    elif vuln["severity"] == "High":
+                        max_vuln_prob = max(max_vuln_prob, 0.72)
+                    elif vuln["severity"] == "Medium":
+                        max_vuln_prob = max(max_vuln_prob, 0.45)
+                
+                if max_vuln_prob > prediction["failure_probability"]:
+                    prediction["failure_probability"] = max_vuln_prob
+                    prediction["risk_level"] = classify_risk_level(max_vuln_prob)
+                    # Update reliability statistics accordingly
+                    from app.ml.evaluation.metrics import compute_reliability_statistics
+                    prediction["reliability_stats"] = compute_reliability_statistics(max_vuln_prob)
+            except Exception as e:
+                print(f"[WARNING] Static vulnerability analysis failed: {e}")
+        
+        recommendations = vulnerability_recommendations + recommendations
+
         # 5. Persist prediction to DB
         saved_prediction = prediction_repository.create(
             db,
@@ -143,6 +176,22 @@ class PredictionService:
             feature_contributions=shap_result["shap_values"],
             risk_level=prediction["risk_level"],
         )
+
+        # Scan for static vulnerabilities (secrets, weak algorithms) & prepend findings
+        project = project_repository.get(db, id=project_id)
+        source_path = project.source_code_path if project else None
+        vulnerability_recommendations = []
+        
+        if source_path:
+            try:
+                from app.services.vulnerability_scanner import VulnerabilityScanner
+                findings = VulnerabilityScanner.scan(source_path)
+                for finding in findings:
+                    vulnerability_recommendations.append(json.dumps(finding))
+            except Exception as e:
+                print(f"[WARNING] Static vulnerability analysis in explanation failed: {e}")
+                
+        recommendations = vulnerability_recommendations + recommendations
 
         return {
             "project_id": project_id,
