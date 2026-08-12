@@ -63,27 +63,9 @@ class Settings(BaseSettings):
                     host = host.replace(" ", "-")
 
                 # Reconstruct v_clean with the space-sanitized host
-                rest_part = rest[host_end:]
-
-                # Check if running inside Render and using a Render Postgres URL
-                import os
-                if os.environ.get("RENDER") == "true" and host.endswith(".render.com"):
-                    # The internal hostname is the first part of the external hostname (e.g. dpg-xxx-a)
-                    host = host.split(".")[0]
-                    # Also strip any sslmode parameters if converting to internal URL
-                    # to prevent SSL connection issues on the internal network.
-                    if "?" in rest_part:
-                        base_rest, query = rest_part.split("?", 1)
-                        query_params = query.split("&")
-                        filtered_params = [p for p in query_params if not p.startswith("sslmode=")]
-                        if filtered_params:
-                            rest_part = f"{base_rest}?{'&'.join(filtered_params)}"
-                        else:
-                            rest_part = base_rest
-
-                v_clean = f"{prefix}@{host}{rest_part}"
+                v_clean = f"{prefix}@{host}{rest[host_end:]}"
                 
-                # If connecting to Render Postgres externally or if internal connection is unavailable, ensure sslmode=require is set
+                # If connecting to Render Postgres, ensure sslmode=require is set
                 if host.endswith(".render.com") and "sslmode=" not in v_clean:
                     if "?" in v_clean:
                         v_clean += "&sslmode=require"

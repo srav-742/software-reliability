@@ -17,19 +17,7 @@ if '@' in db_url:
     if ' ' in host:
         host = host.replace(' ', '-')
     
-    rest_part = rest[host_end:]
-    if os.environ.get("RENDER") == "true" and host.endswith(".render.com"):
-        host = host.split(".")[0]
-        if "?" in rest_part:
-            base_rest, query = rest_part.split("?", 1)
-            query_params = query.split("&")
-            filtered_params = [p for p in query_params if not p.startswith("sslmode=")]
-            if filtered_params:
-                rest_part = f"{base_rest}?{'&'.join(filtered_params)}"
-            else:
-                rest_part = base_rest
-
-    db_url = f"{prefix}@{host}{rest_part}"
+    db_url = f"{prefix}@{host}{rest[host_end:]}"
     if host.endswith('.render.com') and 'sslmode=' not in db_url:
         if '?' in db_url:
             db_url += '&sslmode=require'
