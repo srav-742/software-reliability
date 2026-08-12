@@ -9,6 +9,9 @@ if [ -d "backend" ]; then
   cd backend
 fi
 
+echo "Waiting for database connection to be established..."
+python scripts/wait_for_db.py
+
 echo "Running Alembic migrations..."
 alembic upgrade head
 
