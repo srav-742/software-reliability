@@ -10,9 +10,10 @@ from app.core.logging import logger
 
 def init_sentry() -> None:
     """Initializes Sentry Error Tracking if SENTRY_DSN is provided."""
-    if settings.SENTRY_DSN:
+    dsn = settings.SENTRY_DSN
+    if dsn and (dsn.startswith("http://") or dsn.startswith("https://")):
         sentry_sdk.init(
-            dsn=settings.SENTRY_DSN,
+            dsn=dsn,
             environment=settings.ENVIRONMENT,
             traces_sample_rate=1.0 if settings.ENVIRONMENT == "development" else 0.1,
             integrations=[
@@ -21,6 +22,8 @@ def init_sentry() -> None:
             ],
         )
         logger.info("Sentry SDK successfully initialized", extra={"environment": settings.ENVIRONMENT})
+    elif dsn:
+        logger.warning("SENTRY_DSN provided but is invalid (must start with http:// or https://). Sentry initialization skipped.")
 
 
 def init_monitoring(app: FastAPI) -> None:
