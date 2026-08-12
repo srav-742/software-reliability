@@ -17,16 +17,12 @@ if '@' in db_url:
     if ' ' in host:
         host = host.replace(' ', '-')
     
-    if os.environ.get('RENDER') == 'true' and host.endswith('.render.com'):
-        host = host.split('.')[0]
-        db_url = f"{prefix}@{host}{rest[host_end:]}"
-    else:
-        db_url = f"{prefix}@{host}{rest[host_end:]}"
-        if host.endswith('.render.com') and 'sslmode=' not in db_url:
-            if '?' in db_url:
-                db_url += '&sslmode=require'
-            else:
-                db_url += '?sslmode=require'
+    db_url = f"{prefix}@{host}{rest[host_end:]}"
+    if host.endswith('.render.com') and 'sslmode=' not in db_url:
+        if '?' in db_url:
+            db_url += '&sslmode=require'
+        else:
+            db_url += '?sslmode=require'
 
 if db_url.startswith('sqlite'):
     print('SQLite database detected, skipping PostgreSQL connection check.')
