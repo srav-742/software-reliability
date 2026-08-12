@@ -17,6 +17,8 @@ engine_kwargs = {
 if not settings.DATABASE_URL.startswith("sqlite"):
     engine_kwargs["pool_pre_ping"] = True
     engine_kwargs["pool_recycle"] = 300
+    if "render.com" in settings.DATABASE_URL or "sslmode=require" in settings.DATABASE_URL:
+        connect_args["sslmode"] = "require"
 
 engine = create_engine(
     settings.DATABASE_URL,

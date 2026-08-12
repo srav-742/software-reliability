@@ -57,6 +57,7 @@ def run_migrations_online():
         configuration,
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
+        connect_args={"sslmode": "require"} if "render.com" in database_url or "sslmode=require" in database_url else {},
     )
 
     with connectable.connect() as connection:
