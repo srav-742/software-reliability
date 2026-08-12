@@ -61,7 +61,20 @@ class Settings(BaseSettings):
                 host = rest[:host_end]
                 if " " in host:
                     host = host.replace(" ", "-")
+
+                # If running on Render, convert external database host to internal database host
+                import os
+                if os.environ.get("RENDER") == "true" and host.endswith(".render.com"):
+                    host = host.split(".")[0]
                     v_clean = f"{prefix}@{host}{rest[host_end:]}"
+                else:
+                    v_clean = f"{prefix}@{host}{rest[host_end:]}"
+                    # If connecting externally to Render Postgres, ensure sslmode=require is set
+                    if host.endswith(".render.com") and "sslmode=" not in v_clean:
+                        if "?" in v_clean:
+                            v_clean += "&sslmode=require"
+                        else:
+                            v_clean += "?sslmode=require"
 
             if v_clean.startswith("postgres://"):
                 return v_clean.replace("postgres://", "postgresql+psycopg2://", 1)

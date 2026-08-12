@@ -15,7 +15,18 @@ if '@' in db_url:
             host_end = idx
     host = rest[:host_end]
     if ' ' in host:
-        db_url = f"{prefix}@{host.replace(' ', '-')}{rest[host_end:]}"
+        host = host.replace(' ', '-')
+    
+    if os.environ.get('RENDER') == 'true' and host.endswith('.render.com'):
+        host = host.split('.')[0]
+        db_url = f"{prefix}@{host}{rest[host_end:]}"
+    else:
+        db_url = f"{prefix}@{host}{rest[host_end:]}"
+        if host.endswith('.render.com') and 'sslmode=' not in db_url:
+            if '?' in db_url:
+                db_url += '&sslmode=require'
+            else:
+                db_url += '?sslmode=require'
 
 if db_url.startswith('sqlite'):
     print('SQLite database detected, skipping PostgreSQL connection check.')
