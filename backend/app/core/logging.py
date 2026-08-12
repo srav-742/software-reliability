@@ -9,13 +9,31 @@ from pythonjsonlogger import jsonlogger
 from app.config import settings
 
 
+class CustomConsoleFormatter(logging.Formatter):
+    """Custom formatter for local development console logging."""
+    def format(self, record):
+        if not hasattr(record, "request_id"):
+            record.request_id = "-"
+        if not hasattr(record, "environment"):
+            record.environment = settings.ENVIRONMENT
+        return super().format(record)
+
+
 def setup_logging() -> logging.Logger:
-    """Configures structured JSON logging for the application."""
+    """Configures logging: structured JSON in production, clean readable text in development/staging."""
     log_handler = logging.StreamHandler(sys.stdout)
-    formatter = jsonlogger.JsonFormatter(
-        "%(asctime)s %(levelname)s %(name)s %(message)s %(request_id)s %(environment)s",
-        timestamp=True
-    )
+    
+    if settings.ENVIRONMENT == "production":
+        formatter = jsonlogger.JsonFormatter(
+            "%(asctime)s %(levelname)s %(name)s %(message)s %(request_id)s %(environment)s",
+            timestamp=True
+        )
+    else:
+        # Standard human-readable console logging for development
+        formatter = CustomConsoleFormatter(
+            "[%(asctime)s] %(levelname)-8s in %(name)s: %(message)s [req_id=%(request_id)s]"
+        )
+        
     log_handler.setFormatter(formatter)
 
     root_logger = logging.getLogger()
@@ -26,7 +44,7 @@ def setup_logging() -> logging.Logger:
     logging.getLogger("uvicorn.access").handlers = [log_handler]
     
     logger = logging.getLogger("app")
-    logger.info("Structured JSON logging initialized", extra={"environment": settings.ENVIRONMENT})
+    logger.info("Logging initialized", extra={"environment": settings.ENVIRONMENT})
     return logger
 
 
