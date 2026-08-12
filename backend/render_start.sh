@@ -5,7 +5,9 @@
 
 set -e
 
-cd backend
+if [ -d "backend" ]; then
+  cd backend
+fi
 
 echo "Running Alembic migrations..."
 alembic upgrade head
