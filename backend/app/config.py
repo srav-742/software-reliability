@@ -48,6 +48,21 @@ class Settings(BaseSettings):
     def assemble_db_connection(cls, v: str) -> str:
         if isinstance(v, str):
             v_clean = v.strip().strip("'\"")
+            # Clean spaces from the hostname segment if present (e.g. Render database URL typo)
+            if "@" in v_clean:
+                parts = v_clean.split("@", 1)
+                prefix = parts[0]
+                rest = parts[1]
+                host_end = len(rest)
+                for char in [":", "/"]:
+                    idx = rest.find(char)
+                    if idx != -1 and idx < host_end:
+                        host_end = idx
+                host = rest[:host_end]
+                if " " in host:
+                    host = host.replace(" ", "-")
+                    v_clean = f"{prefix}@{host}{rest[host_end:]}"
+
             if v_clean.startswith("postgres://"):
                 return v_clean.replace("postgres://", "postgresql+psycopg2://", 1)
             elif v_clean.startswith("postgresql://"):

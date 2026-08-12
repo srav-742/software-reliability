@@ -5,6 +5,18 @@ echo "Waiting for database connection..."
 python -c "
 import time, os, psycopg2
 db_url = os.environ.get('DATABASE_URL', '')
+if '@' in db_url:
+    parts = db_url.split('@', 1)
+    prefix, rest = parts[0], parts[1]
+    host_end = len(rest)
+    for char in [':', '/']:
+        idx = rest.find(char)
+        if idx != -1 and idx < host_end:
+            host_end = idx
+    host = rest[:host_end]
+    if ' ' in host:
+        db_url = f"{prefix}@{host.replace(' ', '-')}{rest[host_end:]}"
+
 if db_url.startswith('sqlite'):
     print('SQLite database detected, skipping PostgreSQL connection check.')
     exit(0)
