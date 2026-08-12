@@ -21,10 +21,27 @@ def wait_for_db():
     elif conn_url.startswith("postgres://"):
         conn_url = conn_url.replace("postgres://", "postgresql://", 1)
 
+    # Detect if we are on Render and using an external URL
+    is_render = os.environ.get("RENDER") == "true" or os.environ.get("RENDER") is not None
+    is_external_render_db = ".render.com" in conn_url
+
+    if is_render and is_external_render_db:
+        print("=" * 80)
+        print("WARNING: You are using the EXTERNAL Database URL (containing '.render.com') inside a Render environment.")
+        print("Render PostgreSQL databases block external connections by default via Access Control lists (firewall).")
+        print("To fix this, update your DATABASE_URL environment variable in your Render service settings to the INTERNAL Database URL.")
+        print("The Internal Database URL is faster, free, and does not require IP allow-listing.")
+        print("=" * 80)
+
+    # Setup connection args, explicitly forcing sslmode if connecting to a Render DB externally
+    connect_args = {}
+    if "sslmode=" not in conn_url and is_external_render_db:
+        connect_args["sslmode"] = "require"
+
     print("Checking database connection...")
     for i in range(30):
         try:
-            conn = psycopg2.connect(conn_url)
+            conn = psycopg2.connect(conn_url, **connect_args)
             conn.close()
             print("Database connection established!")
             return
